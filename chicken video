@@ -1,0 +1,52 @@
+let video;
+let playing = false;
+let ww = 500;
+let wh = 500;
+let boxes = [];
+let rowBoxes = 1;
+
+function setup() {
+    video = createVideo("chicken.MP4");
+    video.loop();
+    video.size(500,500);
+    video.position(0,0);
+    // fft = new p5.FFT();
+}
+
+function draw() {}
+
+
+function keyPressed() {
+    if (key === " ") {
+        if (playing) {
+            video.pause();
+            playing = false;
+        } else {
+            video.play();
+            playing = true;
+        }
+    }
+  
+    if (key === "m") {
+        
+        clear();
+        ww = ww /2;
+        wh = wh / 2;
+        x = 0;
+        y = 0;
+        rowBoxes = rowBoxes * 2;
+        boxesPos = 0;
+        for (let i = 0; i < rowBoxes; i ++) {
+            for (let j = 0; j < rowBoxes; j ++) {
+              boxes[boxesPos] = createVideo("chicken.MP4");
+              boxes[boxesPos].size(ww,wh);
+              boxes[boxesPos].position(x,y);
+              boxes[boxesPos].loop();
+              boxesPos ++;
+              x = x + ww;
+          }
+          x = 0;
+          y = y + wh;
+        }
+    }
+}
