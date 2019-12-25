@@ -1,0 +1,539 @@
+let mgr;
+
+// images
+let rocket;
+let insideRocket;
+
+// arrays
+let roadY = [];
+let roadY2 = [];
+let shelf = [];
+let houseRoad = [];
+let starPoints = [];
+
+// Positions
+let x;
+let y;
+
+// rads
+let earthRad;
+let habRad;
+let rocketWindowRad;
+let rocketEarthRad;
+
+function setup() {
+  createCanvas(800, 600);
+  rectMode(CENTER);
+  ellipseMode(CENTER);
+  
+  rocket = loadImage ("rocket.png");
+  insideRocket = loadImage ("insideRocket.png");
+  
+  mgr = new SceneManager();
+  mgr.showScene( Intro );
+}
+
+function draw() {
+  mgr.draw();  
+}
+
+function mouseClicked() {
+  mgr.handleEvent("mouseClicked");
+}
+
+function Intro () {
+  this.draw = function () {
+    noStroke ();
+    background ("#f5c9ed");
+    // TEXT
+    fill("#4f2a28");
+    textSize(80);
+    textFont("Garamond");
+    text("adventure", 250, height/2);
+    textSize(30);
+    textFont("Garamond");
+    text("begin", 360, 400);
+
+  } 
+  this.mouseClicked = function () {
+    if (mouseX >  360 && mouseX < 430 && mouseY > 370 && mouseY < 410) {
+      this.sceneManager.showScene(Scene);
+    }
+  }
+}
+
+function Scene () {
+  this.draw = function () {
+    noStroke ();
+    background ("#f7eeb7");
+    // TEXT
+    fill("#4f2a28");
+    textSize(20);
+    text("click an object to begin", 400, 250);
+    // mts
+    fill("#523f3d");
+    triangle (550, 400, 300, 600, 800, 600);
+    fill ("#471424");
+    triangle (750, 350, 500, 600, 900, 600);
+    fill ("#804539");
+    triangle (300, 450, 0, 600, 800, 600);
+    fill ("#63413a");
+    triangle (100, 300, -200, 600, 300, 600);
+    // ROAD AND GRASS
+    fill ("#a6675e");
+    rect (400, 540, 800, 100);
+    fill(45);
+    rect (400, 570, 800, 100);
+    // SUN
+    fill (200, 180, 0, 200);
+    ellipse (700, 100, 100, 100);
+    fill (200, 120, 0, 200);
+    ellipse (700, 100, 75, 75);
+    fill (200, 80, 0, 200);
+    ellipse (700, 100, 50, 50);
+    fill (200, 0, 0, 200);
+    ellipse (700, 100, 25, 25);
+    // CAR
+    // shell
+    fill("#f50505");
+    rect(500, 500, 160, 80, 20);
+    // wheels
+    fill(0);
+    ellipse(460, 540, 40, 40);
+    ellipse(540, 540, 40, 40);
+    // windows
+    fill(200);
+    rect(460, 490, 30, 30, 5);
+    rect(500, 490, 30, 30, 5);
+    rect(540, 490, 30, 30, 5);
+    // HOT AIR BALLOON
+    //strings
+    stroke("#4a231c");
+    strokeWeight(2);
+    line(190, 100, 190, 200);
+    line(210, 100, 210, 200);
+    // basket
+    fill("#4a231c");
+    rect(200, 200, 50, 30, 5);
+    // balloon
+    noStroke();
+    fill("#dbb060");
+    ellipse(200, 100, 80, 100);
+    // HOUSE
+    // body
+    fill ("#d4d0cf");
+    rect (170, 470, 100, 80, 5);
+    // roof
+    fill ("#38170f");
+    rect (170, 430, 120, 20);
+    rect (170, 415, 90, 20);
+    rect (170, 400, 60, 20);
+    // windows
+    fill (0);
+    rect (150, 470, 20, 20, 5);
+    rect (190, 470, 20, 20, 5);
+  }
+  
+  this.mouseClicked = function () {
+    // if the sun is pressed, scene is now space
+    let sunRad = sqrt((700-mouseX)**2 + (100-mouseY)**2);
+    if (sunRad < 50) {
+      this.sceneManager.showScene( Sun );
+    }
+    // if the car is clicked, the scene is now the road
+    if (mouseX > 420 && mouseX < 580 && mouseY > 460 && mouseY < 540) {
+      this.sceneManager.showScene( Traffic );
+    }
+    // if house is clicked go to window view
+    if (mouseX > 120 && mouseX < 220 && mouseY > 430 && mouseY < 510) {
+      this.sceneManager.showScene( House );
+    }
+    // if the hot air balloon is pressed, the scene is now in the sky
+    // formula of an ellipse to calculate where to click:
+    habRad = ((((200 - mouseX) ** 2)/(80 ** 2)) + (((100 - mouseY) ** 2) / (100 ** 2)));
+    if (habRad < 0.25) { // not sure why it has to be 0.25; it was being glitchy and this was the number that worked and din't crash my computer
+      this.sceneManager.showScene(Hab);   
+    }
+  }
+}
+
+function Sun() {
+  this.enter = function () {
+    for (let a = 0; a < 50; a++) {
+      starPoints[a] = [random (0,800), random(0,800)];    
+    }
+  }
+  
+  this.draw = function() {
+   background ("#131426")
+    // stars
+    stroke (255);
+    strokeWeight(5);
+    for (let a = 0; a < 50; a ++) {
+      point (starPoints[a][0], starPoints[a][1]);
+    }
+    // PLANETS
+    noStroke ();
+    //sun
+    fill (200, 180, 0, 200);
+    ellipse (675, 125, 250, 250);
+    fill (200, 120, 0, 200);
+    ellipse (675, 125, 225, 225);
+    fill (200, 80, 0, 200);
+    ellipse (675, 125, 200, 200);
+    fill (200, 0, 0, 200);
+    ellipse (675, 125, 175, 175);
+    //mercury
+    fill ("#bfa27c");
+    ellipse(560, 220 - mouseX, 20, 20);
+    // venus
+    fill("#e0a353");
+    ellipse (mouseX + 520, 250, 35, 35);
+    // earth
+    fill("#3bad3f");
+    ellipse(460 - mouseX, 290 - mouseX, 40, 40);
+    //mars
+    fill ("#eda87e");
+    ellipse (410 + mouseX, 330 + mouseX, 30, 30);
+    // jupiter
+    fill ("#f7ddcd");
+    ellipse (340 - mouseX, 370, 100, 100);
+    // saturn
+    fill ("#f7ecc8");
+    ellipse (240 + mouseX, 440, 90, 90);
+    stroke ("#f5dca9");
+    strokeWeight (10);
+    line (190 + mouseX, 420, 290 + mouseX, 460);
+    //uranus
+    noStroke();
+    fill ("#b5ddeb");
+    ellipse (150 - mouseX, 490 + mouseX, 80, 80);
+    // neptune
+    fill ("#5d7bf0");
+    ellipse (60, 550 - mouseX, 80, 80); 
+    // text
+    fill (255);
+    textSize (20);
+    text ("find the earth to return" , 350, 470);
+    text ("or", 530, 490);
+    text ("click the rocket ship's window", 450, 510);
+    // rocket ship
+    translate (width / 2, height / 2);
+    rotate (PI * 0.7);
+    image (rocket, -40, -300 + mouseX);
+    translate (0, 0);
+  }
+  
+  this.mouseClicked = function () {
+    // go into rocket from space view
+    rocketWindowRad = sqrt((340-mouseX)**2 + (250-mouseY)**2);
+    if (rocketWindowRad < 10) {
+      this.sceneManager.showScene (Rocket);
+    }
+    // if the earth is clicked, go back to earth
+    earthRad = sqrt((200-mouseX)**2 + (50-mouseY)**2);
+    if (earthRad < 40) {
+      this.sceneManager.showScene( Scene );  
+    }
+  }
+}
+
+function Rocket () {
+  this.setup = function () {
+    for (let a = 0; a < 50; a++) {
+      starPoints[a] = [random (0,800), random(0,800)];    
+    }
+      // rocket shelves
+    for (let a = 0; a*150 <= height; a++) {
+      shelf[a] = a*150     
+    }
+  }
+
+  this.draw = function () {
+    background ("#131426");
+    noStroke();
+    // earth 
+    fill ("#3bad3f");
+    ellipse (500, 50 + mouseX / 2, 200, 200);
+    // stars
+    stroke(255);
+    strokeWeight(4);
+    for (let a = 0; a < 50; a ++) {
+      point (starPoints[a][0], starPoints[a][1]);
+    }
+
+    // inside rocket
+    image (insideRocket, -75, -5, insideRocket.width * 1.66, insideRocket.height * 1.68); 
+    // shelves
+    noStroke();
+    fill (100);
+    for (let i = 0; i < shelf.length; i++) { 
+      rect(0, shelf[i], 100, 30, 5);
+    }
+    for (let i = 0; i < shelf.length; i++) { 
+      rect(800, shelf[i], 100, 30, 5);
+    }
+    // text boxes
+    fill (0);
+    rect (140, 50, 260, 50); // earth box
+    fill ("#62c5cc");
+    text ("click here to return to earth", 20, 50);
+  }
+  
+  this.mouseClicked = function () {
+    // go back to earth from rocket window
+    if (mouseX > 10 && mouseX < 270 && mouseY > 25 && mouseY < 75) {
+      this.sceneManager.showScene (Scene);
+    }
+  }
+}
+
+function Traffic () {
+  this.setup = function () { 
+    // road lines: draws as many rects 50 apart down the height
+    for (let a = 0; a*50 <= height; a++) {
+      roadY[a] = a * 50     
+      roadY2[a] = a * 50
+    }
+  }
+  this.draw = function () {
+    background ("#a6675e");
+    noStroke ();
+    // ROADS
+    // callRandom();
+    // randLimiter = true;
+    fill (65);
+    rect (200, 300, 300, 600);
+    rect (600, 300, 300, 600);
+
+    // road lines
+    fill ("#f5eea9");
+    // road 1
+    for (let i = 0; i < roadY.length; i++) { 
+      rect(200, roadY[i], 5, 20);
+        // if greater than height, go back to 0
+        if (roadY[i] > height) {
+          roadY[i] = 0;
+        }
+        // keep lines moving continuously
+        else {
+          roadY[i] = roadY[i] + 1;
+        } 
+    }
+    // road 2
+    for (let i = 0; i < roadY2.length; i++) { 
+      rect(600, roadY2[i], 5, 20);
+      if (roadY2[i] < 0) {
+        roadY2[i] = height;
+      }
+      else {
+        roadY2[i] = roadY2[i] - 1;
+      } 
+    }
+    // road 1
+    // red cars
+    fill("#f50505");
+    rect (275, 100 + mouseX, 30, 50, 5);
+    rect (125, 400 - mouseX, 30, 50, 5);
+    // blue cars
+    fill ("#1a4f9c");
+    rect (275, 300 - mouseX, 30, 50, 5);
+    // yellow car !
+    fill ("#fce726");
+    rect (125, 150 + mouseX * 3, 30, 50, 5);
+    // black cars
+    fill (40);  
+    rect (275, 400 + mouseX / 2, 30, 50, 5);
+    rect (125, 500 - mouseX * 3, 30, 50, 5);
+    // dirty tan cars
+    fill ("#918381");
+    rect (275, 550 - mouseX ** 1.1, 30, 50, 5);
+    rect (125, 50 + mouseX / 2, 30, 50, 5);
+    // ice cars
+    fill ("#ced3db");
+    rect (275, 200 + mouseX, 30, 50, 5);
+    rect (125, 300 - mouseX, 30, 50, 5);
+    
+    // road 2
+    // blue cars
+    fill("#1a4f9c"); 
+    rect (675, 50 + mouseX * 2, 30, 50, 5);
+    rect (525, 400 + mouseX, 30, 50, 5);
+    // ice cars
+    fill ("#ced3db");
+    rect (675, 300 + mouseX / 2, 30, 50, 5);
+    rect (525, 200 + mouseX, 30, 50, 5);
+    // dirty tan cars
+    fill ("#918381");  
+    rect (675, 180 - mouseX, 30, 50, 5);
+    rect (525, 500 - mouseX * 4, 30, 50, 5);
+    // black cars
+    fill (40);
+    rect (675, 550 + mouseX, 30, 50, 5);
+    rect (525, 20 + mouseX, 30, 50, 5);
+    // red cars
+    fill ("#f50505");
+    rect (675, 400 - mouseX, 30, 50, 5);
+    rect (525, 300 - mouseX, 30, 50, 5);
+    
+    // text
+    fill (0);
+    rect (400, 65, 200, 30);
+    fill("#bfb1ae");
+    text ("find the yellow car", 320, 70);
+  }
+  
+  this.mouseClicked = function () {
+  // if yellow car is clicked go back to scene
+    if (mouseX < 140 && mouseX > 110 && mouseY > 475 && mouseY < 550) {
+      this.sceneManager.showScene( Scene );  
+    }
+  }
+}
+
+function House () {
+  this.setup = function () {
+    // house view road lines
+    for (let a = 0; a*50 <= width; a++) {
+      houseRoad[a] = a*50     
+    }
+  }
+  this.draw = function () {
+     background ("#a6675e");
+    // road
+    noStroke();
+    fill (60);
+    rect (400, 400, 800, 100);
+    // road lines
+    for (let i = 0; i < houseRoad.length; i++) { 
+      fill ("#f5eea9");
+      rect(houseRoad[i], 400, 15, 3);
+      if (houseRoad[i] > width) {
+        houseRoad[i] = 0;
+      }
+      else {
+        houseRoad[i] = houseRoad[i] + 1;
+      } 
+    }
+    // cars
+    noStroke();
+    // red
+    fill ("#f50505");
+    rect (200 + mouseX, 420, 40, 20, 5);
+    fill (0);
+    ellipse (190 + mouseX, 430, 10, 10);
+    ellipse (210 + mouseX, 430, 10, 10);
+    fill ("#f50505");
+    rect (500 - mouseX, 420, 40, 20, 5);
+    fill (0);
+    ellipse (490 - mouseX, 430, 10, 10);
+    ellipse (510 - mouseX, 430, 10, 10);
+    fill ("#f50505");
+    rect (400 + mouseX, 370, 40, 20, 5);
+    fill (0);
+    ellipse (390 + mouseX, 380, 10, 10);
+    ellipse (410 + mouseX, 380, 10, 10);  
+    // dirty tan
+    fill ("#918381");
+    rect (550 - mouseX * 2, 420, 40, 20, 5);
+    fill (0);
+    ellipse (540 - mouseX * 2, 430, 10, 10);
+    ellipse (560 - mouseX * 2, 430, 10, 10);
+    // black car
+    fill (0);
+    rect (150 - mouseX, 370, 40, 20, 5);
+    ellipse (140 - mouseX, 380, 10, 10);
+    ellipse (160 - mouseX, 380, 10, 10);
+    // blue cars
+    fill("#1a4f9c");
+    rect (250 + mouseX * 2, 370, 40, 20, 5);
+    fill (0);
+    ellipse (240 + mouseX * 2, 380, 10, 10);
+    ellipse (260 + mouseX * 2, 380, 10, 10);
+    fill("#1a4f9c");
+    rect (680 - mouseX / 2, 420, 40, 20, 5);
+    fill (0);
+    ellipse (670 - mouseX / 2, 430, 10, 10);
+    ellipse (690 - mouseX / 2, 430, 10, 10);
+    // yellow car !
+    fill ("#fce726");
+    rect (380 - mouseX, 420, 40, 20, 5);
+    fill (0);
+    ellipse (370 - mouseX, 430, 10, 10);
+    ellipse (390 - mouseX, 430, 10, 10);
+    // window
+    noFill ();
+    stroke ("#382b28");
+    strokeWeight (50);
+    rect (400, 300, 750, 550);
+    strokeWeight (5);
+    line (400, 0, 400, 600);
+    line (0, 300, 800, 300);
+    // text box
+    noStroke();
+    fill (255);
+    text ("find the black car", 520, 105);
+  }
+  
+  this.mouseClicked = function () {
+    if (mouseX > 65 && mouseX < 85 && mouseY > 360 && mouseY < 380) {
+      this.sceneManager.showScene( Traffic );
+    }
+  }
+}
+
+function Hab () {
+  this.draw = function () {
+     background ("#f7eeb7");
+    noStroke ();
+    // sun
+    fill (200, 180, 0, 200);
+    ellipse (400, 100, 50, 50);
+    // mts
+    fill("#523f3d");
+    triangle (550 + mouseX, 350, 300 + mouseX, 600, 800 + mouseX, 600);
+    fill ("#471424");
+    triangle (750, 300 - mouseX, 500, 600 - mouseX, 900, 600 - mouseX);
+    fill ("#804539");
+    triangle (300 - mouseX, 400, 0 - mouseX, 600, 800 - mouseX, 600);
+    // cloud
+    fill (255);
+    rect (600 + mouseX, 150, 150, 100, 5);
+    // hab 1
+    //strings
+    stroke("#4a231c");
+    strokeWeight(2);
+    line(590, 100 + mouseX, 590, 200 + mouseX);
+    line(610, 100 + mouseX, 610, 200 + mouseX);
+    // basket
+    fill("#4a231c");
+    rect(600, 200 + mouseX, 50, 30, 5);
+    // balloon
+    noStroke();
+    fill("#875e51");
+    ellipse(600, 100 + mouseX, 70, 90);
+    // another mt
+    fill ("#63413a");
+    triangle (100, 200 + mouseX, -200, 600 + mouseX, 300, 600 + mouseX);
+    // clouds
+    fill (255);
+    rect (100, 100 + mouseX, 100, 80, 5);
+    // more clouds
+    fill (255);
+    rect (200 - mouseX, 120, 80, 60, 5);
+    rect (400, 350 - mouseX, 60, 40, 5);
+    rect (600 - mouseX, 100, 100, 80, 5);
+    // text
+    rect(650, 545, 150, 30);
+    fill (0);
+    text ("find the sun", 600, 550);  
+  }
+  
+  this.mouseClicked = function () {
+    // if sun is pressed, go to space
+    let sunRad2 = sqrt((400-mouseX)**2 + (100-mouseY)**2);
+    if (sunRad2 < 25) {
+      this.sceneManager.showScene( Sun );   
+    }
+  }
+}
